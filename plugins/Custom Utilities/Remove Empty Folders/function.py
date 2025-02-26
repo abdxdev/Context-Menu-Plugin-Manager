@@ -1,10 +1,11 @@
-from tkinter import messagebox, Tk, ttk, IntVar, BooleanVar
-import tkinter as tk
 import os
+import tkinter as tk
+from tkinter import messagebox, Tk, ttk, IntVar, BooleanVar
+
 from send2trash import send2trash
 
 
-def driver(items: list[str] = [], params: str = ""):
+def driver(items: list[str] = [], params: dict = {}):
     try:
         level = selector_window()
         folders_to_remove = []

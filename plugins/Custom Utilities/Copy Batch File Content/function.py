@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox
 import tkinter as tk
 
 
-def driver(items: list[str] = [], params: str = ""):
+def driver(items: list[str] = [], params: dict = {}):
     try:
         content = {}
         for folder in items:

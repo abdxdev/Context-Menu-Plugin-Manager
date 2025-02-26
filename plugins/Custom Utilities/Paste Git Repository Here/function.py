@@ -1,16 +1,10 @@
+import re
 from os import system
 from pyperclip import paste
 from tkinter import messagebox
-import re
 
-plugin_info = {
-    "title": "Paste Git Repository Here",
-    "description": "Clone a git repository",
-    "type": ["DIRECTORY_BACKGROUND"],
-    "menu_name": "abd Utils",
-}
 
-def driver(items: list[str] = [], params: str = ""):
+def driver(items: list[str] = [], params: dict = {}):
     mat = re.match(r"(?:https?:\/\/)?github\.com\/([^\/]+)\/([^\/]+?)(?:\.git)?(?:\/.*)?$", paste())
     if mat:
         owner = mat.group(1)

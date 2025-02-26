@@ -1,0 +1,25 @@
+{
+    "name": "Sunset",
+    "description": "A warm theme inspired by the colors of a sunset.",
+    "palette": {
+        "bg": "#2a1a2a",
+        "bg-selection": "#3a2a3a",
+        "bg-low": "#201420",
+        "bg-low-selection": "#2a1e2a",
+        "bg-low-hover": "#302430",
+        "bg-high": "#3a2a3a",
+        "bg-high-selection": "#483448",
+        "bg-high-hover": "#4e3a4e",
+        "primary": "#ff6f61",
+        "secondary": "#ffcc00",
+        "tertiary": "#ffa500",
+        "text": "#e0e0e0",
+        "text-muted": "#a0a0a0",
+        "divider": "#4e3a4e",
+        "divider-alt": "#ffcc00",
+        "error": "#ff4444",
+        "warning": "#ffa500",
+        "info": "#ffcc00",
+        "success": "#ff6f61"
+    }
+}

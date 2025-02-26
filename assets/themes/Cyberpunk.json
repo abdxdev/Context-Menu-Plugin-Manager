@@ -1,0 +1,25 @@
+{
+    "name": "Cyberpunk",
+    "description": "A neon-lit theme inspired by futuristic cyberpunk cities.",
+    "palette": {
+        "bg": "#1a1a2e",
+        "bg-selection": "#2a2a3e",
+        "bg-low": "#141420",
+        "bg-low-selection": "#1e1e2a",
+        "bg-low-hover": "#242430",
+        "bg-high": "#2a2a3e",
+        "bg-high-selection": "#343448",
+        "bg-high-hover": "#3a3a4e",
+        "primary": "#ff007f",
+        "secondary": "#00ffcc",
+        "tertiary": "#ffcc00",
+        "text": "#e0e0e0",
+        "text-muted": "#a0a0a0",
+        "divider": "#3a3a4e",
+        "divider-alt": "#00ffcc",
+        "error": "#ff4444",
+        "warning": "#ffcc00",
+        "info": "#00ffcc",
+        "success": "#00ff7f"
+    }
+}

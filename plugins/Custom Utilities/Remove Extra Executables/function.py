@@ -1,11 +1,12 @@
-from tkinter import messagebox
 import os
-from send2trash import send2trash
-from tkinter import ttk
 import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+
+from send2trash import send2trash
 
 
-def driver(items: list[str] = [], params: str = ""):
+def driver(items: list[str] = [], params: dict = {}):
     try:
         dict_of_files = {}
         allowed = ["cpp", "c"]

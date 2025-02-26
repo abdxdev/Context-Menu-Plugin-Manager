@@ -36,7 +36,13 @@ class Themes:
     def __init__(self, path: Path):
         self.themes: list[Theme] = []
         self.load_themes(path)
-        self.current = self.themes[0]
+        self.current = self.get_default()
+
+    def get_default(self):
+        for theme in self.themes:
+            if theme.name == "Omni":
+                return theme
+        return self.themes[0]
 
     def load_themes(self, path: Path):
         for theme in os.listdir(path):

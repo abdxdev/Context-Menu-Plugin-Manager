@@ -1,7 +1,7 @@
 __pycache__
 cache
 .env
-.venv
+.venv*
 .vs
 .vscode
 session.*
@@ -9,3 +9,9 @@ tempCodeRunnerFile.*
 *.old
 temp
 storage
+python
+build
+dist
+*.exe
+*.spec
+_internal

@@ -8,7 +8,6 @@ import flet as f
 
 from PluginManager import *
 from DropZone import LoadDLL
-from AI import AI
 
 # all_installed = False
 # while not all_installed:
@@ -260,11 +259,17 @@ def main(page: f.Page, pm: PluginManager):
             f.Column(
                 [
                     cf.Text("Select the theme to change to", size=cf.Text.Size.MEDIUM),
-                    theme := f.RadioGroup(
-                        f.Column(
-                            [cf.Radio(value=name, label=name) for name in pm.themes.get_themes()],
-                        ),
-                        value=pm.themes.current.name,
+                    f.Column(
+                        [
+                            theme := f.RadioGroup(
+                                f.Column(
+                                    [cf.Radio(value=name, label=name) for name in pm.themes.get_themes()],
+                                ),
+                                value=pm.themes.current.name,
+                            ),
+                        ],
+                        scroll=f.ScrollMode.ADAPTIVE,
+                        expand=True,
                     ),
                 ],
                 spacing=20,
@@ -537,16 +542,15 @@ def main(page: f.Page, pm: PluginManager):
                         cf.Button("Add Plugin", icon=f.Icons.ADD, on_click=add_plugin_dialog),
                         f.PopupMenuButton(
                             items=[
-                                # icon=f.Icons.FOLDER
-                                # icon=f.Icons.DELETE
-                                # icon=f.Icons.PALETTE
-                                f.PopupMenuItem(text="Open Plugins Folder", on_click=lambda e: (cf.show_loading(page), os.system(f'explorer "{PLUGINS_DIR}"'), cf.hide_loading())),
-                                f.PopupMenuItem(text="Force Remove Plugin", on_click=force_remove_plugin),
-                                f.PopupMenuItem(text="Change Theme", on_click=change_theme),
+                                f.PopupMenuItem(text="Open Plugins Folder", on_click=lambda e: (cf.show_loading(page), os.system(f'explorer "{PLUGINS_DIR}"'), cf.hide_loading()), height=30),
+                                f.PopupMenuItem(text="Force Remove Plugin", on_click=force_remove_plugin, height=30),
+                                f.PopupMenuItem(text="Change Theme", on_click=change_theme, height=30),
                             ],
-                            bgcolor=pm.themes.current.palette.bg_high_selection,
+                            bgcolor=pm.themes.current.palette.bg_high,
                             menu_position=f.PopupMenuPosition.UNDER,
                             icon_color=pm.themes.current.palette.text,
+                            icon=f.Icons.MORE_VERT,
+                            enable_feedback=True,
                         ),
                     ],
                     spacing=10,

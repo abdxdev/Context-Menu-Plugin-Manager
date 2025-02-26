@@ -4,26 +4,33 @@
 - Here is the code snippet that you can use to start with.
 - The driver function should accept two arguments:
   - `folders`: list of strings
-  - `params`: string
+  - `params`: dictionary
 
 ```
-import json
+# The `driver` function is the entry point for the Python script.
+# Only this line of code is required to create a plugin
+def driver(items: list[str] = [], params: dict = {}):
 
-
-def driver(items: list[str] = [], params: str = ""):
-    json_data = json.loads(params) if params else {}
-
+    # Example code to print the items and params
     print("Folders/Files:")
-    for folder in items:
-        print(folder)
-
+    for item in items:
+        print(item)
     print("Params:")
-    for key, value in json_data.items():
+    for key, value in params.items():
         print(f"{key}: {value}")
 
+    # Keep the console open by waiting for user input
+    input("Press Enter to exit")
 
+
+# Only here for testing purposes. 
+# This block is not executed when triggered as a plugin
 if __name__ == "__main__":
-    driver(["."])
+    params = {
+        "param1": "value1",
+        "param2": "value2",
+    }
+    driver(["file1.txt", "file2.txt"], params)
 ```
 
 ### `folders`
@@ -38,12 +45,12 @@ if __name__ == "__main__":
 
 ### `params`
 
-- The params argument should contain the JSON string.
-- The JSON string should contain the key-value pairs.
+- The params argument should contain the dictionary.
+- The dictionary should contain the key-value pairs.
   - The key should be a string name as set in the configs object.
   - The value should be the user input value or default value.
 
 ### General Instructions
 
 - Note that when user runs the plugin from context menu, if the info is printed in the terminal, it will be immidiately closed. So, it is recommended to use `input()` function to hold the terminal open.
-- User can access the configs in the "Congigure Plugin" tab.
+- User can access the configs in the "Configure Plugin" tab.

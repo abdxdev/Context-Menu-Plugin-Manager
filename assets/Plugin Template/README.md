@@ -26,7 +26,7 @@ The `driver` function is the entry point for the Python script.
 
 
 # Only this line of code is required to create a plugin
-def driver(items: list[str] = [], params: str = ""):
+def driver(items: list[str] = [], params: dict = {}):
 
     # Convert JSON string to dictionary
     json_data = json.loads(params) if params else {}

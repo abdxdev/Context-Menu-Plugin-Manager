@@ -6,6 +6,7 @@ from pathlib import Path
 import requests
 from f_icon import create_icon
 
+
 def get_movie_poster(api_key, movie_name, year, type="movie"):
     params = {
         "query": movie_name,
@@ -46,7 +47,7 @@ def get_movies(folder_path) -> dict[Path, tuple[str, str]]:
     return movies
 
 
-def driver(items: list[str] = [], params: str = ""):
+def driver(items: list[str] = [], params: dict = {}):
     folder_path = items[0]
     movies = get_movies(folder_path)
     for path, movie in movies.items():

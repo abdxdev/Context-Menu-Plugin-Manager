@@ -1,0 +1,25 @@
+{
+    "name": "Forest",
+    "description": "A nature-inspired theme with earthy tones and lush greens.",
+    "palette": {
+        "bg": "#1a2a1a",
+        "bg-selection": "#2a3a2a",
+        "bg-low": "#142014",
+        "bg-low-selection": "#1e2a1e",
+        "bg-low-hover": "#243024",
+        "bg-high": "#2a3a2a",
+        "bg-high-selection": "#344834",
+        "bg-high-hover": "#3a4e3a",
+        "primary": "#4caf50",
+        "secondary": "#8bc34a",
+        "tertiary": "#cddc39",
+        "text": "#e0e0e0",
+        "text-muted": "#a0a0a0",
+        "divider": "#3a4e3a",
+        "divider-alt": "#8bc34a",
+        "error": "#ff4444",
+        "warning": "#ffcc00",
+        "info": "#8bc34a",
+        "success": "#4caf50"
+    }
+}

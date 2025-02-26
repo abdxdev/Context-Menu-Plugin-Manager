@@ -2,5 +2,14 @@
     "description": "Display the folder tree of the current directory",
     "supported_types": [
         "DIRECTORY_BACKGROUND"
+    ],
+    "configs": [
+        {
+            "name": "skip_folders",
+            "label": "Skip folders",
+            "type": "str",
+            "default": ".git,__pycache__,env,.vscode,.venv,debug,build,dist,node_modules,public",
+            "description": "Comma separated list of folders to skip"
+        }
     ]
 }

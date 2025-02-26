@@ -1,13 +1,14 @@
 import os
+import sys
 import json
 import uuid
 import shutil
+import subprocess
 from pathlib import Path
 from types import FunctionType
 from typing import Literal, Any
 from importlib.util import spec_from_file_location, module_from_spec
 
-from context_menu import menus
 from flet import (
     Image,
     Text,
@@ -18,40 +19,103 @@ from flet import (
 
 from AI import AI
 from Themes import Themes
+from context_menu import menus
 
 
 ROOT = Path(__file__).parent.parent.resolve()
+
 PLUGINS_DIR = ROOT / "plugins"
-os.makedirs(PLUGINS_DIR, exist_ok=True)
 TEMP_DIR = ROOT / "temp"
-os.makedirs(TEMP_DIR, exist_ok=True)
+
 ASSETS_DIR = ROOT / "assets"
-os.makedirs(ASSETS_DIR, exist_ok=True)
-THEMES_DIR = ROOT / "assets" / "themes"
-os.makedirs(THEMES_DIR, exist_ok=True)
-PLUGIN_TEMPLATE = ROOT / "assets" / "Plugin Template"
-DROPZONE_DLL_PATH = ROOT / "src" / "DropZone.dll"
-SESSION_FILE = ROOT / "session.json"
+THEMES_DIR = ASSETS_DIR / "themes"
+PLUGIN_TEMPLATE = ASSETS_DIR / "Plugin Template"
+
 SCHEMA_FILE = ASSETS_DIR / "schema.json"
 SYSTEM_INSTRUCTIONS_FILE = ASSETS_DIR / "system_instructions.md"
+
+SESSION_FILE = ROOT / "session.json"
+DROPZONE_DLL_PATH = ROOT / "src" / "DropZone.dll"
+
+PYTHON_EXE = ROOT / "python" / "python.exe"
+PLUGIN_VENV_PATH = ROOT / ".plugins.venv"
+PLUGIN_VENV_PIP_EXE = PLUGIN_VENV_PATH / "Scripts" / "pip.exe"
+PLUGIN_VENV_PYTHON_EXE = PLUGIN_VENV_PATH / "Scripts" / "python.exe"
+PLUGIN_VENV_PYTHONW_EXE = PLUGIN_VENV_PATH / "Scripts" / "pythonw.exe"
+
 PLUGIN_TYPES = ["DIRECTORY", "DIRECTORY_BACKGROUND", "DRIVE", "FILES", "DESKTOP"]
 
+if not PLUGIN_VENV_PATH.exists():
+    print("running")
+    subprocess.run(
+        [
+            PYTHON_EXE,
+            "-m",
+            "venv",
+            PLUGIN_VENV_PATH,
+        ],
+        shell=True,
+        # check=True,
+    )
+os.makedirs(PLUGINS_DIR, exist_ok=True)
+os.makedirs(TEMP_DIR, exist_ok=True)
+os.makedirs(ASSETS_DIR, exist_ok=True)
+os.makedirs(THEMES_DIR, exist_ok=True)
 
+# print(
+#     [
+#         ROOT,
+#         PLUGINS_DIR,
+#         TEMP_DIR,
+#         ASSETS_DIR,
+#         THEMES_DIR,
+#         PLUGIN_TEMPLATE,
+#         DROPZONE_DLL_PATH,
+#         PYTHON_EXECUTABLE,
+#         SESSION_FILE,
+#         SCHEMA_FILE,
+#         SYSTEM_INSTRUCTIONS_FILE,
+#         PLUGIN_TYPES,
+#     ]
+# )
+
+
+# PYTHON_EXECUTABLE = ROOT / "python" / "pythonw.exe"
 # DOT_ENV = ROOT / ".env"
-def driver_decorator(func: FunctionType) -> FunctionType:
-    def wrapper(*args, **kwargs):
-        if "params" in kwargs:
-            if isinstance(kwargs["params"], str):
-                kwargs["params"] = json.loads(kwargs["params"])
-        else:
-            if len(args) > 1 and isinstance(args[1], str):
-                args = list(args)
-                args[1] = json.loads(args[1])
-                args = tuple(args)
-        return func(*args, **kwargs)
 
-    return wrapper
+# def driver_decorator(func: FunctionType) -> FunctionType:
+#     def wrapper(*args, **kwargs):
+#         if "params" in kwargs:
+#             if isinstance(kwargs["params"], str):
+#                 kwargs["params"] = json.loads(kwargs["params"])
+#         else:
+#             if len(args) > 1 and isinstance(args[1], str):
+#                 args = list(args)
+#                 args[1] = json.loads(args[1])
+#                 args = tuple(args)
+#         return func(*args, **kwargs)
 
+#     return wrapper
+# ---------------------------------------------------------
+# subprocess.run(
+#     [
+#         str(PLUGIN_VENV_PATH / "Scripts" / "pip.exe"),
+#         "install",
+#         "-r",
+#         str(PLUGINS_DIR / "Custom Utilities" / "Movie Thumbnails" / "requirements.txt"),
+#     ],
+#     shell=True,
+#     check=True,
+# )
+# site_packages = next((p for p in (PLUGIN_VENV_PATH / "Lib").glob("python*/site-packages")), None)
+# if site_packages:
+#     sys.path.insert(0, str(site_packages))
+
+# subprocess.run(
+#     ["pip", "list"],
+#     shell=True,
+#     check=True,
+# )
 
 class Controls:
     icon: Image = None
@@ -68,78 +132,100 @@ class Plugin(menus.ContextCommand):
         self,
         name: str,
         python: FunctionType | None = None,
-        path: Path | str | None = None,
-        icon_path: Path | str | None = None,
+        plugin_path: Path | str | None = None,
+        icon_path: str | None = None,
         markdown: Path | str | None = None,
         description: str | None = None,
         supported_types: list[Literal["FILES", "DIRECTORY", "DIRECTORY_BACKGROUND", "DRIVE", "DESKTOP"]] | None = None,
         enabled: bool = False,
         configs: dict[str, Any] | None = None,
-        params: str = "",
-        type: str = "",
+        params: dict[str, Any] | None = None,
+        type: str | None = None,
+        python_path: str = sys.executable,
+        func_name: str | None = None,
+        func_file_name: str | None = None,
+        func_dir_path: str | None = None,
+        # requirements: list = [],
     ):
         super().__init__(
             name=name,
             python=python,
-            icon_path=str(icon_path),
+            params = params,
+            icon_path=icon_path,
+            python_path=python_path,
+            func_name = func_name,
+            func_file_name = func_file_name,
+            func_dir_path = func_dir_path,
         )
         self.id = uuid.uuid4()
-        self.name = name
-        self.python = python
-        self.icon_path = str(icon_path)
         self.markdown = markdown
         self.description = description
         self.supported_types = supported_types
         self.selected_types = supported_types
-        self.path = path
+        self.path = plugin_path
         self.enabled = enabled
         self.configs = configs
         self.type = type
-        self.params = params
         self.controls: Controls = Controls()
 
         self.set_params_from_config()
 
     @staticmethod
+    def install_plugin_requirements(requirements: Path):
+        try:
+            subprocess.run([str(PLUGIN_VENV_PATH / "Scripts" / "pip.exe"), "install", "-r", str(requirements)], shell=True, check=True)
+            return True
+        except:
+            return False
+
+    @staticmethod
     def is_plugin_folder(path: Path) -> bool:
         return "function.py" in os.listdir(path) and "plugin.json" in os.listdir(path)
 
+    @staticmethod
     def get_from_path(path: Path) -> "Plugin":
-        plugin_json = json.loads(open(path / "plugin.json").read())
 
-        spec = spec_from_file_location("function", path / "function.py")
-        module = module_from_spec(spec)
-        spec.loader.exec_module(module)
-        # module.driver = driver_decorator(module.driver)
+        if "requirements.txt" in os.listdir(path):
+            Plugin.install_plugin_requirements(path / "requirements.txt")
+        plugin_json = json.load(open(path / "plugin.json"))
+
+        # spec = spec_from_file_location("function", path / "function.py")
+        # module = module_from_spec(spec)
+        # spec.loader.exec_module(module)
+        # python = module.driver
 
         return Plugin(
             name=path.name,
-            icon_path=path / "icon.ico" if "icon.ico" in os.listdir(path) else ASSETS_DIR / "favicon.ico",
+            icon_path=str(path / "icon.ico" if "icon.ico" in os.listdir(path) else ASSETS_DIR / "favicon.ico"),
             markdown=path / "README.md" if "README.md" in os.listdir(path) else ASSETS_DIR / "README.md",
             description=plugin_json["description"],
             supported_types=plugin_json["supported_types"],
             configs=plugin_json["configs"] if "configs" in plugin_json else None,
-            python=module.driver,
+            python_path=str(PLUGIN_VENV_PYTHON_EXE if plugin_json.get("allow_terminal", True) else PLUGIN_VENV_PYTHONW_EXE),
             enabled=False,
-            path=path,
+            plugin_path=path,
+            func_name="driver",
+            func_file_name="function",
+            func_dir_path=str(path),
+            # python=python,
         )
 
     def __repr__(self):
-        return "ContextCommand(name='{}', icon_path='{}', params='{}') {}".format(
+        return "ContextCommand(name='{}', icon_path='{}', params={}) {}".format(
             self.name,
             self.icon_path,
-            json.dumps(self.configs).replace(r'"', r"\"") if self.configs else "",
+            json.dumps(self.params) if self.params else {},
             self.selected_types,
         )
 
     def set_params_from_config(self):
         if not self.configs:
-            self.params = ""
+            self.params = {}
             return
         params = {}
         for config in self.configs:
             params[config["name"]] = config["value"] if "value" in config else config["default"]
-        self.params = json.dumps(params).replace(r'"', r"\"")
+        self.params = params
 
     def update_config_values(self, params: dict):
         if not self.configs:
@@ -149,7 +235,7 @@ class Plugin(menus.ContextCommand):
 
     def compile(self):
         if self.enabled:
-            menus.FastCommand(self.name, type=self.type, python=self.python, params=self.params, icon_path=self.icon_path).compile()
+            menus.FastCommand(self.name, type=self.type, python=self.python, params=self.params, icon_path=self.icon_path, python_path=self.python_path).compile()
 
 
 class Menu(menus.ContextMenu):
@@ -234,7 +320,7 @@ class PluginManager:
         if PluginManager.check_path(TEMP_DIR):
             fs.move_contents(TEMP_DIR, PLUGINS_DIR)
         return True
-    
+
     def uninstall_plugin(self, plugin: None | Plugin = None):
         if plugin:
             fs.empty_dir(plugin.path)
@@ -253,7 +339,7 @@ class PluginManager:
 
     def set_settings(self, settings):
         if "ai_api_key" in settings:
-            self.ai_client.set_api_key(settings["ai_api_key"]) 
+            self.ai_client.set_api_key(settings["ai_api_key"])
         if "theme" in settings:
             self.themes.set_theme(settings["theme"])
 
@@ -278,7 +364,7 @@ class PluginManager:
         path = Path(path).resolve()
         if not path.is_dir():
             return
-        
+
         if Plugin.is_plugin_folder(path):
             self.items.append(Plugin.get_from_path(path))
             return
@@ -357,7 +443,7 @@ class PluginManager:
                     new_plugin = Plugin(
                         name=plugin.name,
                         python=plugin.python,
-                        path=plugin.path,
+                        plugin_path=plugin.path,
                         icon_path=plugin.icon_path,
                         markdown=plugin.markdown,
                         description=plugin.description,
@@ -365,6 +451,7 @@ class PluginManager:
                         enabled=plugin.enabled,
                         configs=plugin.configs,
                         params=plugin.params,
+                        # requirements=plugin.requirements,
                         type=type,
                     )
                     expanded_plugins.append(new_plugin)
@@ -462,7 +549,7 @@ class PluginManager:
                 return {
                     "class": "Plugin",
                     "name": item.name,
-                    "params": json.loads(item.params.replace(r"\"", r'"')) if item.params else {},
+                    "params": item.params,
                     "enabled": item.enabled,
                     "selected_types": item.selected_types,
                 }
@@ -495,9 +582,12 @@ class PluginManager:
         if not SESSION_FILE.exists():
             return
 
-        prev_session = PluginManager(no_setup=True)
-        session_data = json.load(open(SESSION_FILE))
+        try:
+            session_data = json.load(open(SESSION_FILE))
+        except:
+            return
         self.set_settings(session_data["settings"]) if not only_items else None
+        prev_session = PluginManager(no_setup=True)
         prev_session.items = [deserialize_item(item) for item in session_data["items"]]
         self.copy_plugin_configuration(prev_session)
 
@@ -506,7 +596,7 @@ class PluginManager:
             for other_item in other.walk_items():
                 if isinstance(item, Plugin) and item.name == other_item.name:
                     item.enabled = other_item.enabled
-                    item.params = json.dumps(other_item.params).replace(r'"', r"\"")
+                    item.params = other_item.params
                     item.selected_types = other_item.selected_types
                     item.update_config_values(other_item.params)
                 elif isinstance(item, Menu) and item.name == other_item.name:
