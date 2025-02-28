@@ -1,5 +1,6 @@
 {
     "description": "Display the folder tree of the current directory",
+    "show_terminal": true,
     "supported_types": [
         "DIRECTORY_BACKGROUND"
     ],

@@ -1,7 +1,7 @@
 __pycache__
 cache
 .env
-.venv*
+*.venv
 .vs
 .vscode
 session.*

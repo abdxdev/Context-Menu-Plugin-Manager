@@ -1,5 +1,6 @@
 {
     "description": "Clone a git repository",
+    "show_terminal": true,
     "supported_types": [
         "DIRECTORY_BACKGROUND"
     ]

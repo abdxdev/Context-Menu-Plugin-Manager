@@ -1,0 +1,21 @@
+- uv support
+- minimize exe size
+- status update 
+- automaically skip installing requirements
+- add list type
+- update readme
+- build market place
+- enhance initial stage
+- handle error messages
+- sign exe
+- make installer
+- oh my posh
+- nilesoft shell
+- rewrite plugin manager
+- app icon
+- minimize loading time
+- first start the app the load
+- correct datatype of params
+- settings inside the context menu
+- auto refresh after changing type
+- disable fast command 

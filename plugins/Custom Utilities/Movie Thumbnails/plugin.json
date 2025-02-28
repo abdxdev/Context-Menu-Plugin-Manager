@@ -1,5 +1,6 @@
 {
     "description": "Create thumbnails for movies",
+    "show_terminal": true,
     "supported_types": [
         "DIRECTORY_BACKGROUND",
         "DIRECTORY"

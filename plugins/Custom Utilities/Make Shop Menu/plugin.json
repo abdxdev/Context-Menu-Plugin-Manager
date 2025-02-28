@@ -1,5 +1,6 @@
 {
     "description": "Make Shop Menu from figma design",
+    "show_terminal": false,
     "supported_types": [
         "FILES"
     ],

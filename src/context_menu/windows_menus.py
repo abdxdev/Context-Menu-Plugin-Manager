@@ -41,9 +41,7 @@ try:
         You can customize where it runs/Force it to run regardless.
         """
         if not is_admin() or force:
-            ctypes.windll.shell32.ShellExecuteW(
-                None, "runas", sys.executable, params, None, 1
-            )
+            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, params, None, 1)
             sys.exit()
 
     # ------------------------------------------------------------------
@@ -114,9 +112,7 @@ except:
         """
         raise NotImplementedError("winreg is not available on this platform")
 
-    def set_key_value(
-        key_path: str, subkey_name: str, value: str | int, hive: int = 0
-    ) -> None:
+    def set_key_value(key_path: str, subkey_name: str, value: str | int, hive: int = 0) -> None:
         """
         Changes the value of a subkey. Creates the subkey if it doesn't exist.
         """
@@ -181,49 +177,37 @@ def context_registry_format(item: str) -> str:
         return join_keys(CONTEXT_SHORTCUTS["FILELOC"], item.lower(), "shell")
     return CONTEXT_SHORTCUTS[item]
 
-def create_file_select_command(
-    func_name: str, func_file_name: str, func_dir_path: str, params: dict[str, Any], python_path: str
-) -> str:
+
+def create_file_select_command(func_name: str, func_file_name: str, func_dir_path: str, params: dict[str, Any], python_path: str) -> str:
     """
     Creates a registry valid command to link a context menu entry to a funtion, specifically for file selection(FILES, DIRECTORY, DRIVE).
 
     Requires the name of the function, the name of the file, and the path to the directory of the file.
     """
-    sys_section = f"""import sys; sys.path.insert(0, '{func_dir_path}')""".replace(
-        "\\", "/"
-    )
+    sys_section = f"""import sys; sys.path.insert(0, '{func_dir_path}')""".replace("\\", "/")
     file_section = f"import {func_file_name}"
     dir_path = """' '.join(sys.argv[1:]) """
     func_section = f"""{func_file_name}.{func_name}([{dir_path}],{str(params).replace(r'"', r"\"")})"""
-    python_portion = (
-        f'''"{python_path}" -c "{sys_section}; {file_section}; {func_section}"'''
-    )
+    python_portion = f'''"{python_path}" -c "{sys_section}; {file_section}; {func_section}"'''
     full_command = f'''{python_portion} \"%1\"'''
 
     return full_command
 
 
-def create_directory_background_command(
-    func_name: str, func_file_name: str, func_dir_path: str, params: dict[str, Any], python_path: str
-) -> str:
+def create_directory_background_command(func_name: str, func_file_name: str, func_dir_path: str, params: dict[str, Any], python_path: str) -> str:
     """
     Creates a registry valid command to link a context menu entry to a funtion, specifically for backgrounds(DIRECTORY_BACKGROUND, DESKTOP_BACKGROUND).
 
     Requires the name of the function, the name of the file, and the path to the directory of the file.
     """
-    sys_section = (
-        f"""import sys; import os; sys.path.insert(0, '{func_dir_path}')""".replace(
-            "\\", "/"
-        )
-    )
+    sys_section = f"""import sys; import os; sys.path.insert(0, '{func_dir_path}')""".replace("\\", "/")
     file_section = f"import {func_file_name}"
     dir_path = "os.getcwd()"
     func_section = f"""{func_file_name}.{func_name}([{dir_path}],{str(params).replace(r'"', r"\"")})"""
-    full_command = (
-        f'''"{python_path}" -c "{sys_section}; {file_section}; {func_section}"'''
-    )
+    full_command = f'''"{python_path}" -c "{sys_section}; {file_section}; {func_section}"'''
 
     return full_command
+
 
 # windows_menus.py ----------------------------------------------------------------------------------------
 
@@ -256,7 +240,7 @@ class RegistryMenu:
         set_key_value(key_path, "MUIVerb", name)
         set_key_value(key_path, "subcommands", "")
         if icon_path is not None:
-            set_key_value(key_path, 'Icon', icon_path)
+            set_key_value(key_path, "Icon", icon_path)
 
         key_shell_path = join_keys(key_path, "shell")
         create_key(key_shell_path)
@@ -276,11 +260,9 @@ class RegistryMenu:
         set_key_value(command_path, "", command)
 
         if icon_path is not None:
-            set_key_value(key_path, 'Icon', icon_path)
+            set_key_value(key_path, "Icon", icon_path)
 
-    def compile(
-        self, items: list[ItemType] | None = None, path: str | None = None
-    ) -> None:
+    def compile(self, items: list[ItemType] | None = None, path: str | None = None) -> None:
         """
         Used to create the menu. Recursively iterates through each element in the top level menu.
         """
@@ -302,14 +284,10 @@ class RegistryMenu:
             new_command = None
             if self.type in ["DIRECTORY_BACKGROUND", "DESKTOP_BACKGROUND"]:
                 # If it requires a background command
-                new_command = create_directory_background_command(
-                    func_name, func_file_name, func_dir_path, item.params, item.python_path
-                )
+                new_command = create_directory_background_command(func_name, func_file_name, func_dir_path, item.params, item.python_path)
             else:
                 # If it requires a file command
-                new_command = create_file_select_command(
-                    func_name, func_file_name, func_dir_path, item.params, item.python_path
-                )
+                new_command = create_file_select_command(func_name, func_file_name, func_dir_path, item.params, item.python_path)
             self.create_command(item.name, path, new_command, item.icon_path)
 
 
@@ -326,15 +304,13 @@ class FastRegistryCommand:
         self,
         name: str,
         type: ActivationType | str,
-        python: FunctionType,
-        params: dict[str, Any],
+        python: FunctionType | None = None,
+        params: dict[str, Any] = {},
         icon_path: str = None,
         python_path: str = sys.executable,
-
         func_name: str | None = None,
         func_file_name: str | None = None,
         func_dir_path: str | None = None,
-
     ) -> None:
         self.name = name
         self.type = type
@@ -351,7 +327,7 @@ class FastRegistryCommand:
     def get_method_info(self) -> MethodInfo:
         if self.func_name and self.func_file_name and self.func_dir_path:
             return (self.func_name, self.func_file_name, self.func_dir_path)
-        
+
         import inspect
 
         func_file_path = os.path.abspath(inspect.getfile(self.python))
@@ -374,19 +350,15 @@ class FastRegistryCommand:
         func_name, func_file_name, func_dir_path = self.get_method_info()
         if self.type in ["DIRECTORY_BACKGROUND", "DESKTOP_BACKGROUND"]:
             # If it requires a background selection
-            new_command = create_directory_background_command(
-                func_name, func_file_name, func_dir_path, self.params, self.python_path
-            )
+            new_command = create_directory_background_command(func_name, func_file_name, func_dir_path, self.params, self.python_path)
         else:
             # If it requires a file selection
-            new_command = create_file_select_command(
-                func_name, func_file_name, func_dir_path, self.params, self.python_path
-            )
+            new_command = create_file_select_command(func_name, func_file_name, func_dir_path, self.params, self.python_path)
 
         set_key_value(command_path, "", new_command)
 
         if self.icon_path is not None:
-            set_key_value(key_path, 'Icon', self.icon_path)
+            set_key_value(key_path, "Icon", self.icon_path)
 
 
 # Testing section...

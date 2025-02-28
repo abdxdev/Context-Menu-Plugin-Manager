@@ -1,6 +1,6 @@
 {
     "description": "Remove empty folders from the selected folder(s)",
-    "allow_terminal": false,
+    "show_terminal": false,
     "supported_types": [
         "DIRECTORY_BACKGROUND",
         "DIRECTORY"

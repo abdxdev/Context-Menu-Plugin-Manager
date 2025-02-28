@@ -3,6 +3,7 @@ import time
 from typing import Callable
 import shutil
 import time
+import subprocess
 
 import flet as f
 
@@ -284,7 +285,6 @@ def main(page: f.Page, pm: PluginManager):
     def force_remove_plugin(e: f.ControlEvent):
         def handle_force_remove_plugin(name: str, types: list[str]):
             for type in types:
-                print(name, type)
                 pm.remove_menu_by_name(name, type)
             cf.ShowSnackBar("The plugin has been removed successfully", page)
 
@@ -311,7 +311,7 @@ def main(page: f.Page, pm: PluginManager):
                     ),
                 ],
                 spacing=20,
-                height=300,
+                height=350,
             ),
             actions={
                 "Remove": lambda e: handle_force_remove_plugin(name.value, [control.label for control in checkboxes.controls if control.value]),
@@ -419,7 +419,7 @@ def main(page: f.Page, pm: PluginManager):
                 "Enter the Gemeni API key to generate the plugin" if not key else "The key is invalid. Please enter a valid Gemeni API key.",
                 text_feild := cf.TextField(label="Key", multiline=False, max_lines=1, value=pm.ai_client.get_api_key()),
                 actions={
-                    "Get a Gemini API Key": lambda e: os.system("start https://ai.google.dev/gemini-api/docs"),
+                    "Get a Gemini API Key": lambda e: (cf.show_loading(page), subprocess.run(["start", "https://ai.google.dev/gemini-api/docs"], shell=True), cf.hide_loading()),
                     "Next": lambda e: generate_plugin_btn(e, text_feild.value),
                     "Cancel": None,
                 },
@@ -482,7 +482,7 @@ def main(page: f.Page, pm: PluginManager):
                 "The plugin has been made successfully",
                 actions={
                     "Ok": None,
-                    "Open in VSCode": lambda e: (os.system(f'code "{PLUGINS_DIR / name}"'), cf.load_for(0.5, page)),
+                    "Open in VSCode": lambda e: (cf.show_loading(page), subprocess.run(["code", PLUGINS_DIR / name], shell=True), cf.hide_loading()),
                 },
             ).show(page)
 
@@ -542,7 +542,7 @@ def main(page: f.Page, pm: PluginManager):
                         cf.Button("Add Plugin", icon=f.Icons.ADD, on_click=add_plugin_dialog),
                         f.PopupMenuButton(
                             items=[
-                                f.PopupMenuItem(text="Open Plugins Folder", on_click=lambda e: (cf.show_loading(page), os.system(f'explorer "{PLUGINS_DIR}"'), cf.hide_loading()), height=30),
+                                f.PopupMenuItem(text="Open Plugins Folder", on_click=lambda e: (cf.show_loading(page), subprocess.run(["explorer", PLUGINS_DIR], shell=True), cf.hide_loading()), height=30),
                                 f.PopupMenuItem(text="Force Remove Plugin", on_click=force_remove_plugin, height=30),
                                 f.PopupMenuItem(text="Change Theme", on_click=change_theme, height=30),
                             ],
@@ -722,8 +722,8 @@ def main(page: f.Page, pm: PluginManager):
                                     f.Row(
                                         [
                                             # Component.Button("Uninstall"),
-                                            cf.Button(text="View in Explorer", on_click=lambda e: (cf.show_loading(page), os.system(f'explorer "{pm.selected_plugin.path}"'), cf.hide_loading())),
-                                            cf.Button(text="Open in VSCode", on_click=lambda e: (cf.show_loading(page), os.system(f'code "{pm.selected_plugin.path}"'), cf.hide_loading())),
+                                            cf.Button(text="View in Explorer", on_click=lambda e: (cf.show_loading(page), subprocess.run(["explorer", pm.selected_plugin.path], shell=True), cf.hide_loading())),
+                                            cf.Button(text="Open in VSCode", on_click=lambda e: (cf.show_loading(page), subprocess.run(["code", pm.selected_plugin.path], shell=True), cf.hide_loading())),
                                             cf.Button(text="Uninstall Plugin", on_click=uninstall_plugin),
                                         ],
                                     ),
@@ -862,7 +862,7 @@ def main(page: f.Page, pm: PluginManager):
             scroll=f.ScrollMode.ADAPTIVE,
         )
 
-        pm.selected_plugin.types_control = control
+        pm.selected_plugin.controls.types_control = control
 
         if not pm.selected_plugin.configs:
             return config_column
@@ -906,7 +906,7 @@ def main(page: f.Page, pm: PluginManager):
 
     def reset_plugin_configs(e: f.ControlEvent):
         pm.selected_plugin.selected_types = pm.selected_plugin.supported_types
-        for control in pm.selected_plugin.types_control.controls:
+        for control in pm.selected_plugin.controls.types_control.controls:
             control.value = control.label in pm.selected_plugin.selected_types
         if pm.selected_plugin.configs:
             for config in pm.selected_plugin.configs:
@@ -924,7 +924,7 @@ def main(page: f.Page, pm: PluginManager):
         cf.ShowSnackBar("Configurations reset successfully", page)
 
     def save_plugin_configs(e: f.ControlEvent):
-        pm.selected_plugin.selected_types = [control.label for control in pm.selected_plugin.types_control.controls if control.value]
+        pm.selected_plugin.selected_types = [control.label for control in pm.selected_plugin.controls.types_control.controls if control.value]
         if pm.selected_plugin.configs:
             for config in pm.selected_plugin.configs:
                 if config["type"] == "str":

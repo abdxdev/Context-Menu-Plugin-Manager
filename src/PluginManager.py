@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 from types import FunctionType
 from typing import Literal, Any
-from importlib.util import spec_from_file_location, module_from_spec
+# from importlib.util import spec_from_file_location, module_from_spec
 
 from flet import (
     Image,
@@ -15,6 +15,7 @@ from flet import (
     Button,
     Markdown,
     Container,
+    Column,
 )
 
 from AI import AI
@@ -55,7 +56,6 @@ if not PLUGIN_VENV_PATH.exists():
             PLUGIN_VENV_PATH,
         ],
         shell=True,
-        # check=True,
     )
 os.makedirs(PLUGINS_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
@@ -111,11 +111,6 @@ os.makedirs(THEMES_DIR, exist_ok=True)
 # if site_packages:
 #     sys.path.insert(0, str(site_packages))
 
-# subprocess.run(
-#     ["pip", "list"],
-#     shell=True,
-#     check=True,
-# )
 
 class Controls:
     icon: Image = None
@@ -125,6 +120,7 @@ class Controls:
     markdown: Markdown = None
     tile: Button = None
     enable_disable_btn: Button = None
+    types_control: Column = None
 
 
 class Plugin(menus.ContextCommand):
@@ -136,7 +132,7 @@ class Plugin(menus.ContextCommand):
         icon_path: str | None = None,
         markdown: Path | str | None = None,
         description: str | None = None,
-        supported_types: list[Literal["FILES", "DIRECTORY", "DIRECTORY_BACKGROUND", "DRIVE", "DESKTOP"]] | None = None,
+        supported_types: list[menus.ActivationType] | None = None,
         enabled: bool = False,
         configs: dict[str, Any] | None = None,
         params: dict[str, Any] | None = None,
@@ -150,12 +146,12 @@ class Plugin(menus.ContextCommand):
         super().__init__(
             name=name,
             python=python,
-            params = params,
+            params=params,
             icon_path=icon_path,
             python_path=python_path,
-            func_name = func_name,
-            func_file_name = func_file_name,
-            func_dir_path = func_dir_path,
+            func_name=func_name,
+            func_file_name=func_file_name,
+            func_dir_path=func_dir_path,
         )
         self.id = uuid.uuid4()
         self.markdown = markdown
@@ -183,9 +179,9 @@ class Plugin(menus.ContextCommand):
         return "function.py" in os.listdir(path) and "plugin.json" in os.listdir(path)
 
     @staticmethod
-    def get_from_path(path: Path) -> "Plugin":
+    def get_from_path(path: Path, install_requirements = False) -> "Plugin":
 
-        if "requirements.txt" in os.listdir(path):
+        if install_requirements and "requirements.txt" in os.listdir(path):
             Plugin.install_plugin_requirements(path / "requirements.txt")
         plugin_json = json.load(open(path / "plugin.json"))
 
@@ -201,7 +197,7 @@ class Plugin(menus.ContextCommand):
             description=plugin_json["description"],
             supported_types=plugin_json["supported_types"],
             configs=plugin_json["configs"] if "configs" in plugin_json else None,
-            python_path=str(PLUGIN_VENV_PYTHON_EXE if plugin_json.get("allow_terminal", True) else PLUGIN_VENV_PYTHONW_EXE),
+            python_path=str(PLUGIN_VENV_PYTHON_EXE if plugin_json.get("show_terminal", True) else PLUGIN_VENV_PYTHONW_EXE),
             enabled=False,
             plugin_path=path,
             func_name="driver",
@@ -234,8 +230,17 @@ class Plugin(menus.ContextCommand):
             config["value"] = params[config["name"]] if config["name"] in params else None
 
     def compile(self):
-        if self.enabled:
-            menus.FastCommand(self.name, type=self.type, python=self.python, params=self.params, icon_path=self.icon_path, python_path=self.python_path).compile()
+        menus.FastCommand(
+            self.name,
+            type=self.type,
+            python=self.python,
+            params=self.params,
+            icon_path=self.icon_path,
+            python_path=self.python_path,
+            func_name=self.func_name,
+            func_file_name=self.func_file_name,
+            func_dir_path=self.func_dir_path,
+        ).compile()
 
 
 class Menu(menus.ContextMenu):
@@ -423,7 +428,7 @@ class PluginManager:
         for item in menu.sub_items:
             PluginManager.recursive_print(item, level + 1)
 
-    def get_expand_types(self, filter=None):
+    def get_expand_types(self, filter=None) -> list[Plugin | Menu]:
         expanded_plugins = []
         for plugin in self.items:
             if isinstance(plugin, Menu):
@@ -451,7 +456,10 @@ class PluginManager:
                         enabled=plugin.enabled,
                         configs=plugin.configs,
                         params=plugin.params,
-                        # requirements=plugin.requirements,
+                        python_path=plugin.python_path,
+                        func_name=plugin.func_name,
+                        func_file_name=plugin.func_file_name,
+                        func_dir_path=plugin.func_dir_path,
                         type=type,
                     )
                     expanded_plugins.append(new_plugin)
@@ -492,6 +500,9 @@ class PluginManager:
                 pass
         expanded_items = self.get_expand_types(filter=lambda x: x.enabled == True)
         for item in expanded_items:
+            if isinstance(item, Plugin):
+                if not (item.func_name and item.func_file_name and item.func_dir_path):
+                    print(f"Plugin '{item.name}' is missing function information.")
             item.compile()
 
     def disable_all(self):

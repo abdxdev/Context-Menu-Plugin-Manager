@@ -30,6 +30,10 @@
                     "type": "string",
                     "description": "short description of the plugin"
                 },
+                "show_terminal": {
+                    "type": "boolean",
+                    "description": "show terminal for the plugin"
+                },
                 "supported_types": {
                     "type": "array",
                     "description": "multiple types supported by the plugin to use in different portions of the windows",

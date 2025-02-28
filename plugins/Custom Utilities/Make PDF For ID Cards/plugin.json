@@ -1,5 +1,6 @@
 {
     "description": "Make PDF For ID Cards from figma design",
+    "show_terminal": false,
     "supported_types": [
         "DIRECTORY_BACKGROUND"
     ],

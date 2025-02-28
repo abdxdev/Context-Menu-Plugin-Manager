@@ -10,7 +10,7 @@ from types import FunctionType
 
 from context_menu import windows_menus
 
-ActivationType = Literal["FILES", "DIRECTORY", "DIRECTORY_BACKGROUND", "DRIVE"]
+ActivationType = Literal["FILES", "DIRECTORY", "DIRECTORY_BACKGROUND", "DRIVE", "DESKTOP"]
 ItemType = Union["ContextMenu", "ContextCommand"]
 MethodInfo = Tuple[str, str, str]
 
@@ -129,23 +129,22 @@ class FastCommand:
         self.func_file_name = func_file_name
         self.func_dir_path = func_dir_path
 
-    def get_method_info(self) -> MethodInfo:
-        if func_name and func_file_name and func_dir_path:
-            return (self.func_name, self.func_file_name, self.func_dir_path)
+    # def get_method_info(self) -> MethodInfo:
+    #     if func_name and func_file_name and func_dir_path:
+    #         return (self.func_name, self.func_file_name, self.func_dir_path)
 
-        assert self.python is not None
-        func_file_path = os.path.abspath(inspect.getfile(self.python))
+    #     assert self.python is not None
+    #     func_file_path = os.path.abspath(inspect.getfile(self.python))
 
-        func_dir_path = os.path.dirname(func_file_path).replace("\\", "/")
-        func_name = self.python.__name__
-        func_file_name = os.path.splitext(os.path.basename(func_file_path))[0]
+    #     func_dir_path = os.path.dirname(func_file_path).replace("\\", "/")
+    #     func_name = self.python.__name__
+    #     func_file_name = os.path.splitext(os.path.basename(func_file_path))[0]
 
-        return (func_name, func_file_name, func_dir_path)
+    #     return (func_name, func_file_name, func_dir_path)
 
     def compile(self) -> None:
 
-        if platform.system() == "Windows":
-            windows_menus.FastRegistryCommand(self.name, self.type, self.python, self.params, self.icon_path, self.python_path, self.func_name, self.func_file_name, self.func_dir_path).compile()
+        windows_menus.FastRegistryCommand(self.name, self.type, self.python, self.params, self.icon_path, self.python_path, self.func_name, self.func_file_name, self.func_dir_path).compile()
 
 
 try:
