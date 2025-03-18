@@ -48,20 +48,24 @@ def get_movies(folder_path) -> dict[Path, tuple[str, str]]:
 
 
 def driver(items: list[str] = [], params: dict = {}):
-    folder_path = items[0]
-    movies = get_movies(folder_path)
-    for path, movie in movies.items():
-        if (path / "poster.ico").exists():
-            continue
-        if poster := get_movie_poster(json.loads(params)["tmdb_api_key"], movie[0], movie[1], "movie" if not is_tv(path, movie[0]) else "tv"):
-            with open(path / "poster.jpg", "wb") as f:
-                f.write(poster)
-            create_icon(str(path / "poster.jpg"), str(path))
-            os.remove(path / "poster.jpg")
-        else:
-            print(f"Failed to get poster for {movie[0]}")
-            continue
-
+    try:
+        folder_path = items[0]
+        movies = get_movies(folder_path)
+        for path, movie in movies.items():
+            if (path / "poster.ico").exists():
+                continue
+            if poster := get_movie_poster(params["tmdb_api_key"], movie[0], movie[1], "movie" if not is_tv(path, movie[0]) else "tv"):
+                with open(path / "poster.jpg", "wb") as f:
+                    f.write(poster)
+                create_icon(str(path / "poster.jpg"), str(path))
+                os.remove(path / "poster.jpg")
+            else:
+                print(f"Failed to get poster for {movie[0]}")
+                continue
+    except Exception as e:
+        print(e)
+        print(e.__traceback__)
+        input("Press Enter to exit")
 
 def is_tv(folder_path: Path | str, name: str):
     files_found = 0

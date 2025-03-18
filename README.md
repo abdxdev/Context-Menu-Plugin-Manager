@@ -23,7 +23,7 @@ First make sure you have Python 3.13.1 or above installed. If not, you can downl
 1. Clone the repository:
 
    ```
-   git clone https://github.com/abdbbdii/Context-Menu-Plugin-Manager.git
+   git clone https://github.com/abdxdev/Context-Menu-Plugin-Manager.git
    ```
 
 2. Go inside the repository:
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
 ## License
 
-This project is licensed under the [BSD License](https://github.com/abdbbdii/context-menu-plugin-manager/blob/main/LICENSE).
+This project is licensed under the [BSD License](https://github.com/abdxdev/context-menu-plugin-manager/blob/main/LICENSE).
 
 ## Contributing
 

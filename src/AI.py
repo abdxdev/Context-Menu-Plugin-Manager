@@ -12,7 +12,7 @@ class AI(genai.Client):
         if self.api_key is not None:
             super().__init__(api_key=self.api_key)
             self.is_init = True
-    
+
     def set_api_key(self, api_key: str):
         if not api_key:
             return
@@ -41,7 +41,7 @@ class AI(genai.Client):
             return
         response = self.models.generate_content(
             model="gemini-2.0-flash",
-            contents=[self.system_instructions, contents],
+            contents=[self.system_instructions, contents] if self.system_instructions else contents,
             config={
                 "response_mime_type": "application/json",
                 "response_schema": self.schema,
@@ -49,10 +49,10 @@ class AI(genai.Client):
         )
         return response.parsed
 
-    def generate_content(self, prompt: str):
+    def generate_content(self, contents: str):
         response = self.models.generate_content(
             model="gemini-2.0-flash",
-            contents=prompt,
+            contents=[self.system_instructions, contents] if self.system_instructions else contents,
         )
         return response.text
 

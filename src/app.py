@@ -419,7 +419,7 @@ def main(page: f.Page, pm: PluginManager):
                 "Enter the Gemeni API key to generate the plugin" if not key else "The key is invalid. Please enter a valid Gemeni API key.",
                 text_feild := cf.TextField(label="Key", multiline=False, max_lines=1, value=pm.ai_client.get_api_key()),
                 actions={
-                    "Get a Gemini API Key": lambda e: (cf.show_loading(page), subprocess.run(["start", "https://ai.google.dev/gemini-api/docs"], shell=True), cf.hide_loading()),
+                    "Get a Gemini API Key": lambda e: (cf.show_loading(page), subprocess.run(["start", "https://aistudio.google.com/apikey"], shell=True), cf.hide_loading()),
                     "Next": lambda e: generate_plugin_btn(e, text_feild.value),
                     "Cancel": None,
                 },

@@ -1,21 +1,25 @@
+### deployment
+- make installer
+- app icon
+- sign exe
+- build market place
+### quality improvements
 - uv support
 - minimize exe size
+- minimize loading time
+- first start the app then load
 - status update 
-- automaically skip installing requirements
-- add list type
-- update readme
-- build market place
 - enhance initial stage
 - handle error messages
-- sign exe
-- make installer
-- oh my posh
-- nilesoft shell
-- rewrite plugin manager
-- app icon
-- minimize loading time
-- first start the app the load
-- correct datatype of params
+### features
+- rename option
+- add list type
+- automaically skip installing requirements
 - settings inside the context menu
-- auto refresh after changing type
-- disable fast command 
+- light themes
+### bugs
+- unable to disable fast command
+### least priority
+- nilesoft shell
+- update readme
+- rewrite plugin manager
