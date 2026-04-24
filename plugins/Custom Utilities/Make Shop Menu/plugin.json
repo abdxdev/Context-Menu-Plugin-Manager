@@ -20,8 +20,22 @@
             "default": ""
         },
         {
+            "name": "pamphlet_menu_file_code",
+            "label": "Pamphlet Menu File Code",
+            "description": "Pamphlet Menu File Code from Figma",
+            "type": "str",
+            "default": ""
+        },
+        {
             "name": "flex_menu_file_code",
             "label": "Flex Menu File Code",
+            "description": "Flex Menu File Code from Figma",
+            "type": "str",
+            "default": ""
+        },
+        {
+            "name": "flex_menu_file_code_legacy",
+            "label": "Flex Menu File Code Legacy",
             "description": "Flex Menu File Code from Figma",
             "type": "str",
             "default": ""

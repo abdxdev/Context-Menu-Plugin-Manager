@@ -9,6 +9,10 @@ from svglib.svglib import svg2rlg
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.graphics import renderPDF
+from reportlab.pdfbase.ttfonts import TTFont
+
+# from reportlab.pdfbase import pdfmetrics
+# import cairosvg
 
 
 TEMPLATE_PATH = Path(__file__).parent / "cashe"
@@ -21,6 +25,7 @@ def driver(items: list[str] = [], params: dict = {}):
             figma_file_ids = {
                 "small": params["small_menu_file_code"],
                 "large": params["large_menu_file_code"],
+                "pamphlet": params["pamphlet_menu_file_code"],
             }
             json_file = json.loads(open(file, "r").read())
             CWD = Path(file).parent
@@ -33,34 +38,49 @@ def driver(items: list[str] = [], params: dict = {}):
                 file = open(TEMPLATE_PATH / f"shop_menu_template_{key}.svg", "rb").read()
                 for key_, value in json_file.items():
                     file = file.decode().replace(key_, str(value) if value else "").encode()
-                svg_to_pdf([file], str(CWD / f"shop_menu_{key}.pdf"))
-                startfile(str(CWD / f"shop_menu_{key}.pdf"))
+                if key == "pamphlet":
+                    with open(CWD / f"shop_menu_{key}.svg", "wb") as f:
+                        f.write(file)
+                    # cairosvg.svg2png(url=str(TEMPLATE_PATH / f"shop_menu_template_{key}.svg"), write_to=str(CWD / f"shop_menu_{key}.png"), scale=4)
+                else:
+                    svg_to_pdf([file], str(CWD / f"shop_menu_{key}.pdf"))
+                    startfile(str(CWD / f"shop_menu_{key}.pdf"))
 
             # doing for flex
+            def make_flex(infile, outfile, n):
+                data = []
+                files = []
+                vals = list(filter(lambda x: x is not None, json_file.values()))
+                l = []
+                for a in vals:
+                    l.append(a)
+                    if len(l) == n:
+                        data.append({f":0{i+1}": l[i] for i in range(len(l))})
+                        l = []
+                data.append({f":{'{:02d}'.format(i+1)}": l[i] for i in range(len(l))})
+
+                for group_data in data:
+                    file_ = infile.decode()
+                    for key_, value in group_data.items():
+                        file_ = file_.replace(key_, str(value) if value else "")
+                    files.append(file_.encode())
+
+                svg_to_pdf(files, str(CWD / f"{outfile}.pdf"))
+                startfile(str(CWD / f"{outfile}.pdf"))
+
             if not Path(TEMPLATE_PATH / f"shop_menu_template_flex.svg").exists():
                 flex_file = get_file_from_figma(params["figma_api_key"], params["flex_menu_file_code"], "svg")
                 open(TEMPLATE_PATH / f"shop_menu_template_flex.svg", "wb").write(flex_file)
             flex_file = open(TEMPLATE_PATH / f"shop_menu_template_flex.svg", "rb").read()
 
-            data = []
-            files = []
-            vals = list(filter(lambda x: x is not None, json_file.values()))
-            l = []
-            for a in vals:
-                l.append(a)
-                if len(l) == 3:
-                    data.append({f":0{i+1}": l[i] for i in range(len(l))})
-                    l = []
-            data.append({f":{'{:02d}'.format(i+1)}": l[i] for i in range(len(l))})
+            make_flex(flex_file, "shop_menu_flex", 2)
 
-            for group_data in data:
-                file_ = flex_file.decode()
-                for key_, value in group_data.items():
-                    file_ = file_.replace(key_, str(value))
-                files.append(file_.encode())
+            if not Path(TEMPLATE_PATH / f"shop_menu_template_flex_legacy.svg").exists():
+                flex_file = get_file_from_figma(params["figma_api_key"], params["flex_menu_file_code_legacy"], "svg")
+                open(TEMPLATE_PATH / f"shop_menu_template_flex_legacy.svg", "wb").write(flex_file)
+            flex_file = open(TEMPLATE_PATH / f"shop_menu_template_flex_legacy.svg", "rb").read()
 
-            svg_to_pdf(files, str(CWD / f"shop_menu_flex.pdf"))
-            startfile(str(CWD / f"shop_menu_flex.pdf"))
+            make_flex(flex_file, "shop_menu_flex_legacy", 3)
 
         except Exception as e:
             messagebox.showerror("Error", str(e))
@@ -72,6 +92,8 @@ def get_file_from_figma(api_key, file_id, format, frame="0:1"):
 
 
 def svg_to_pdf(svg_files, output_file_path):
+    # pdfmetrics.registerFont(TTFont('Raleway', str(TEMPLATE_PATH / 'RALEWAY-VARIABLEFONT_WGHT.TTF')))
+    # pdfmetrics.registerFont(TTFont('Jameel Noori Nastaleeq', str(TEMPLATE_PATH / 'JAMEEL NOORI NASTALEEQ.TTF')))
     c = canvas.Canvas(output_file_path, pagesize=A4)
     drawings = [svg2rlg(BytesIO(file)) for file in svg_files]
     for drawing in drawings:
