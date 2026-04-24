@@ -1,8 +1,8 @@
 # Context Menu Plugin Manager
 
-![screenshot_1](screenshots/screenshot_1.png)
-![screenshot_2](screenshots/screenshot_2.png)
-![screenshot_3](screenshots/screenshot_3.png)
+![screenshot_1](https://github.com/abdxdev/Context-Menu-Plugin-Manager/blob/main/screenshots/screenshot_1.png?raw=true)
+![screenshot_2](https://github.com/abdxdev/Context-Menu-Plugin-Manager/blob/main/screenshots/screenshot_2.png?raw=true)
+![screenshot_3](https://github.com/abdxdev/Context-Menu-Plugin-Manager/blob/main/screenshots/screenshot_3.png?raw=true)
 
 This project manages context menu plugins to extend functionality in various directories. It allows dynamic addition and removal of context menu items using Python scripts.
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
 ## License
 
-This project is licensed under the [BSD License](https://github.com/abdxdev/context-menu-plugin-manager/blob/main/LICENSE).
+This project is licensed under the [BSD License](https://github.com/abdxdev/Context-Menu-Plugin-Manager/blob/main/LICENSE).
 
 ## Contributing
 
